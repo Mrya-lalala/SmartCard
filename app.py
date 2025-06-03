@@ -3,10 +3,6 @@ from smartcard import SmartCard
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET"])
-def home():
-    return "<h1>Smart Card API is running</h1><p>Use the /card endpoint to start.</p>"
-
 @app.route("/card", methods=["POST"])
 def create_card():
     card_id = SmartCard.create_card()
