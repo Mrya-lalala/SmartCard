@@ -20,7 +20,8 @@ def api_home():
 # Web interface route (dashboard)
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
-    return "<h1>Smart Card Dashboard</h1><p>Use the /card endpoint or visit /dashboard for the web UI.</p>"
+    return send_from_directory("static", "index.html")
+
 
 # Create a new card
 @app.route("/card", methods=["POST"])
