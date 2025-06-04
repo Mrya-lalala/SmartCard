@@ -1,12 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from smartcard import SmartCard
 
 app = Flask(__name__)
 
-from flask import Flask, jsonify
-
-app = Flask(__name__)
-
+# Homepage for API reference
 @app.route("/", methods=["GET"])
 def api_home():
     return jsonify({
@@ -20,17 +17,18 @@ def api_home():
         ]
     })
 
-# existing routes follow.. 
-
+# Web interface route (dashboard)
 @app.route("/dashboard", methods=["GET"])
-def home():
-    return "<h1>Smart Card API is running</h1><p>Use the /card endpoint to start.</p>"
+def dashboard():
+    return "<h1>Smart Card Dashboard</h1><p>Use the /card endpoint or visit /dashboard for the web UI.</p>"
 
+# Create a new card
 @app.route("/card", methods=["POST"])
 def create_card():
     card_id = SmartCard.create_card()
     return jsonify({"message": "Card created", "card_id": card_id})
 
+# Top up a card
 @app.route("/card/<card_id>/topup", methods=["POST"])
 def top_up(card_id):
     amount = request.json.get("amount")
@@ -41,6 +39,7 @@ def top_up(card_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+# Pay for a meal
 @app.route("/card/<card_id>/pay", methods=["POST"])
 def pay_meal(card_id):
     cost = request.json.get("cost")
@@ -51,6 +50,7 @@ def pay_meal(card_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+# Check balance
 @app.route("/card/<card_id>/balance", methods=["GET"])
 def get_balance(card_id):
     try:
@@ -59,6 +59,7 @@ def get_balance(card_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+# Get transaction history
 @app.route("/card/<card_id>/history", methods=["GET"])
 def get_history(card_id):
     try:
@@ -67,5 +68,6 @@ def get_history(card_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+# Run the app locally (not needed in production on Render)
 if __name__ == "__main__":
     app.run(debug=True)
