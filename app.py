@@ -22,7 +22,7 @@ def api_home():
 
 # existing routes follow.. 
 
-@app.route("/", methods=["GET"])
+@app.route("/dashboard", methods=["GET"])
 def home():
     return "<h1>Smart Card API is running</h1><p>Use the /card endpoint to start.</p>"
 
