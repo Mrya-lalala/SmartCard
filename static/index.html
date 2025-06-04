@@ -2,103 +2,136 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>The Mid Day Meal</title>
+  <title>Smart Card Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #010102;
-      padding: 40px;
-      color: #333;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4rem 2rem;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    .hero-text {
+      flex: 1;
+      padding-right: 2rem;
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 40px;
-      color: #7b7b7b;
+      font-size: 3rem;
+      margin-bottom: 1rem;
     }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    .disco-icon {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 1.5rem;
     }
 
-    .section {
-      margin-bottom: 30px;
+    p {
+      color: #ddd;
+      margin-bottom: 2rem;
     }
 
-    h2 {
-      border-bottom: 2px solid #040506;
-      padding-bottom: 5px;
-      margin-bottom: 15px;
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background: #e100ff;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 15px #e100ff88;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #a100cc;
+      box-shadow: 0 0 20px #e100ffaa;
+    }
+
+    .form-section {
+      background: #1e1e2f;
+      border-radius: 10px;
+      padding: 2rem;
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 0 30px #00000055;
     }
 
     input, button {
-      padding: 10px;
-      margin: 5px 0;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
       width: 100%;
-      box-sizing: border-box;
-    }
-
-    button {
-      background-color: #3498db;
-      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 5px;
       border: none;
-      cursor: pointer;
-      transition: background 0.3s ease;
     }
 
-    button:hover {
-      background-color: #2980b9;
+    input {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
     }
 
     pre {
-      background: #f7f7f7;
-      padding: 15px;
-      border-radius: 8px;
+      background: #111;
+      color: #0f0;
+      padding: 1rem;
+      border-radius: 10px;
       overflow-x: auto;
     }
 
-    .result {
-      font-weight: bold;
-      margin: 10px 0;
-      color: #27ae60;
-    }
-
-    .error {
-      color: #e74c3c;
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+      }
+      .hero-text {
+        padding: 0;
+        text-align: center;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Smart Card Dashboard</h1>
-  <div class="container">
 
-    <div class="section">
-      <h2>Create a New Card</h2>
-      <button onclick="createCard()">Create Card</button>
-      <div id="createResult" class="result"></div>
+  <div class="hero">
+    <div class="hero-text">
+      <h1>JOIN THE CLUB <span class="disco-icon">🪩</span></h1>
+      <p>Manage smart cards for meals with our modern digital dashboard. Top up, pay, and track balances seamlessly.</p>
+      <button class="btn" onclick="createCard()">Create Card</button>
     </div>
+  </div>
 
-    <div class="section">
-      <h2>Card Operations</h2>
-      <input type="text" id="cardId" placeholder="Enter Card ID" />
-      <input type="number" id="topupAmount" placeholder="Top-Up Amount" />
-      <button onclick="topUp()">Top Up</button>
-      <input type="number" id="payAmount" placeholder="Meal Cost" />
-      <button onclick="pay()">Pay</button>
-      <button onclick="checkBalance()">Check Balance</button>
-      <button onclick="getHistory()">Transaction History</button>
-      <div id="result" class="result"></div>
-      <pre id="output"></pre>
-    </div>
-
+  <div class="form-section">
+    <input type="text" id="cardId" placeholder="Enter Card ID">
+    <input type="number" id="topupAmount" placeholder="Top-Up Amount">
+    <button class="btn" onclick="topUp()">Top Up</button>
+    
+    <input type="number" id="payAmount" placeholder="Meal Cost">
+    <button class="btn" onclick="pay()">Pay</button>
+    
+    <button class="btn" onclick="checkBalance()">Check Balance</button>
+    <button class="btn" onclick="getHistory()">Transaction History</button>
+    
+    <div id="result"></div>
+    <pre id="output"></pre>
   </div>
 
   <script>
@@ -107,7 +140,8 @@
     async function createCard() {
       const res = await fetch(`${API}/card`, { method: "POST" });
       const data = await res.json();
-      document.getElementById("createResult").innerText = `New card ID: ${data.card_id}`;
+      document.getElementById("cardId").value = data.card_id;
+      document.getElementById("result").innerText = "New card created: " + data.card_id;
     }
 
     async function topUp() {
@@ -145,9 +179,7 @@
     }
 
     function showResponse(data) {
-      const resultEl = document.getElementById("result");
-      resultEl.innerText = data.message || data.error || "";
-      resultEl.className = data.error ? "error" : "result";
+      document.getElementById("result").innerText = data.message || data.error || "";
       document.getElementById("output").innerText = JSON.stringify(data, null, 2);
     }
 
@@ -155,5 +187,6 @@
       return document.getElementById(id).value.trim();
     }
   </script>
+
 </body>
 </html>
