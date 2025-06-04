@@ -1,36 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Smart Card Dashboard</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 30px; background-color: #f4f4f4; }
-    input, button { padding: 10px; margin: 5px; }
-    .section { margin-bottom: 30px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    h2 { color: #333; }
-    pre { background: #eee; padding: 10px; border-radius: 5px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f4f8;
+      padding: 40px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      color: #2c3e50;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    pre {
+      background: #f7f7f7;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    .result {
+      font-weight: bold;
+      margin: 10px 0;
+      color: #27ae60;
+    }
+
+    .error {
+      color: #e74c3c;
+    }
   </style>
 </head>
 <body>
   <h1>Smart Card Dashboard</h1>
+  <div class="container">
 
-  <div class="section">
-    <h2>Create a New Card</h2>
-    <button onclick="createCard()">Create Card</button>
-    <p id="createResult"></p>
-  </div>
+    <div class="section">
+      <h2>Create a New Card</h2>
+      <button onclick="createCard()">Create Card</button>
+      <div id="createResult" class="result"></div>
+    </div>
 
-  <div class="section">
-    <h2>Use a Card</h2>
-    <input type="text" id="cardId" placeholder="Enter Card ID" />
-    <br />
-    <input type="number" id="topupAmount" placeholder="Amount to Top Up" />
-    <button onclick="topUp()">Top Up</button><br/>
-    <input type="number" id="payAmount" placeholder="Meal Cost" />
-    <button onclick="pay()">Pay</button><br/>
-    <button onclick="checkBalance()">Check Balance</button>
-    <button onclick="getHistory()">Transaction History</button>
-    <p id="result"></p>
-    <pre id="output"></pre>
+    <div class="section">
+      <h2>Card Operations</h2>
+      <input type="text" id="cardId" placeholder="Enter Card ID" />
+      <input type="number" id="topupAmount" placeholder="Top-Up Amount" />
+      <button onclick="topUp()">Top Up</button>
+      <input type="number" id="payAmount" placeholder="Meal Cost" />
+      <button onclick="pay()">Pay</button>
+      <button onclick="checkBalance()">Check Balance</button>
+      <button onclick="getHistory()">Transaction History</button>
+      <div id="result" class="result"></div>
+      <pre id="output"></pre>
+    </div>
+
   </div>
 
   <script>
@@ -39,50 +107,52 @@
     async function createCard() {
       const res = await fetch(`${API}/card`, { method: "POST" });
       const data = await res.json();
-      document.getElementById("createResult").innerText = JSON.stringify(data, null, 2);
+      document.getElementById("createResult").innerText = `New card ID: ${data.card_id}`;
     }
 
     async function topUp() {
-      const cardId = document.getElementById("cardId").value;
-      const amount = document.getElementById("topupAmount").value;
+      const cardId = get("cardId");
+      const amount = parseFloat(get("topupAmount"));
       const res = await fetch(`${API}/card/${cardId}/topup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: parseFloat(amount) })
+        body: JSON.stringify({ amount })
       });
-      const data = await res.json();
-      showOutput(data);
+      showResponse(await res.json());
     }
 
     async function pay() {
-      const cardId = document.getElementById("cardId").value;
-      const cost = document.getElementById("payAmount").value;
+      const cardId = get("cardId");
+      const cost = parseFloat(get("payAmount"));
       const res = await fetch(`${API}/card/${cardId}/pay`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cost: parseFloat(cost) })
+        body: JSON.stringify({ cost })
       });
-      const data = await res.json();
-      showOutput(data);
+      showResponse(await res.json());
     }
 
     async function checkBalance() {
-      const cardId = document.getElementById("cardId").value;
+      const cardId = get("cardId");
       const res = await fetch(`${API}/card/${cardId}/balance`);
-      const data = await res.json();
-      showOutput(data);
+      showResponse(await res.json());
     }
 
     async function getHistory() {
-      const cardId = document.getElementById("cardId").value;
+      const cardId = get("cardId");
       const res = await fetch(`${API}/card/${cardId}/history`);
-      const data = await res.json();
-      showOutput(data);
+      showResponse(await res.json());
     }
 
-    function showOutput(data) {
-      document.getElementById("result").innerText = data.message || data.error || "";
+    function showResponse(data) {
+      const resultEl = document.getElementById("result");
+      resultEl.innerText = data.message || data.error || "";
+      resultEl.className = data.error ? "error" : "result";
       document.getElementById("output").innerText = JSON.stringify(data, null, 2);
+    }
+
+    function get(id) {
+      return document.getElementById(id).value.trim();
     }
   </script>
 </body>
